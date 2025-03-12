@@ -11,22 +11,15 @@ public class Student {
     @NonNull
     private UUID identifier;
     @NonNull
-    private String firstName;
-    @NonNull
-    private String middleName;
-    @NonNull
-    private String lastName;
-    @NonNull
+    private String FIO;
+
     private String className;
     @NonNull
     private Date dateOfBirth;
 
-    public Student(@NonNull UUID identifier, @NonNull String firstName,
-                   @NonNull String middleName, @NonNull String lastName, @NonNull String className) {
+    public Student(@NonNull UUID identifier, @NonNull String FIO, @NonNull String className) {
         this.identifier = identifier;
-        this.firstName = firstName;
-        this.middleName = middleName;
-        this.lastName = lastName;
+        this.FIO = FIO;
         this.className = className;
         this.dateOfBirth = new Date();
     }
@@ -41,30 +34,12 @@ public class Student {
     }
 
     @NonNull
-    public String getFirstName() {
-        return firstName;
+    public String getFIO() {
+        return FIO;
     }
 
-    public void setFirstName(@NonNull String firstName) {
-        this.firstName = firstName;
-    }
-
-    @NonNull
-    public String getMiddleName() {
-        return middleName;
-    }
-
-    public void setMiddleName(@NonNull String middleName) {
-        this.middleName = middleName;
-    }
-
-    @NonNull
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(@NonNull String lastName) {
-        this.lastName = lastName;
+    public void setFIO(@NonNull String FIO) {
+        this.FIO = FIO;
     }
 
     @NonNull
@@ -87,7 +62,7 @@ public class Student {
 
     @Override
     public String toString() {
-        return "Студент: " + identifier + ", " + firstName + ", " + middleName + ", " + lastName + ", " + className + ", " + dateOfBirth;
+        return "Студент: " + identifier + ", " + FIO + ", " + className + ", " + dateOfBirth;
 
     }
 }

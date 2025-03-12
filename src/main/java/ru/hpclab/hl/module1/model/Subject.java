@@ -11,13 +11,25 @@ public class Subject {
     @NonNull
     private String className;
     @NonNull
+    private String teacherName;
+    @NonNull
     private int roomNumber;
 
 
-    public Subject(@NonNull UUID identifier, @NonNull String className, int roomNumber) {
+    public Subject(@NonNull UUID identifier, @NonNull String className, @NonNull String teacherName, int roomNumber) {
         this.identifier = identifier;
         this.className = className;
         this.roomNumber = roomNumber;
+        this.teacherName = teacherName;
+    }
+
+    @NonNull
+    public String getTeacherName() {
+        return teacherName;
+    }
+
+    public void setTeacherName(@NonNull String teacherName) {
+        this.teacherName = teacherName;
     }
 
     @NonNull

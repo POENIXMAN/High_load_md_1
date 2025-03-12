@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import ru.hpclab.hl.module1.model.User;
-import ru.hpclab.hl.module1.repository.UserRepository;
+import ru.hpclab.hl.module1.model.Student;
+import ru.hpclab.hl.module1.repository.StudentRepository;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,27 +26,27 @@ import static org.mockito.Mockito.when;
 public class UserServiceTest {
 
     @Autowired
-    private UserService userService;
+    private StudentService studentService;
 
     @Autowired
-    private UserRepository userRepository;
+    private StudentRepository studentRepository;
 
     @Test
     public void testCreateAndGet(){
         //create
-        User user = new User(UUID.randomUUID(), "name");
+        Student user = new Student(UUID.randomUUID(), "name", "nae", "asf", "asfas");
 
-        User savedUser = userService.saveUser(user);
+        Student savedUser = studentService.saveUser(user);
 
-        Assertions.assertEquals(user.getFio(), savedUser.getFio());
-        Mockito.verify(userRepository, Mockito.times(1)).save(user);
+        Assertions.assertEquals(user.getFirstName(), savedUser.getFirstName());
+        Mockito.verify(studentRepository, Mockito.times(1)).save(user);
 
         //getAll
-        List<User> userList = userService.getAllUsers();
+        List<Student> userList = studentService.getAllStudents();
 
-        Assertions.assertEquals("name1", userList.get(0).getFio());
-        Assertions.assertEquals("name2", userList.get(1).getFio());
-        Mockito.verify(userRepository, Mockito.times(1)).findAll();
+        Assertions.assertEquals("name1", userList.get(0).getFirstName());
+        Assertions.assertEquals("name2", userList.get(1).getFirstName());
+        Mockito.verify(studentRepository, Mockito.times(1)).findAll();
 
     }
 
@@ -54,18 +54,18 @@ public class UserServiceTest {
     static class UserServiceTestConfiguration {
 
         @Bean
-        UserRepository userRepository() {
-            UserRepository userRepository = mock(UserRepository.class);
-            when(userRepository.save(any())).thenReturn(new User(UUID.randomUUID(), "name"));
-            when(userRepository.findAll())
-                    .thenReturn(Arrays.asList(new User(UUID.randomUUID(), "name1"),
-                            new User(UUID.randomUUID(), "name2")));
-            return userRepository;
+        StudentRepository studentRepository() {
+            StudentRepository studentRepository1 = mock(StudentRepository.class);
+            when(studentRepository1.save(any())).thenReturn(new Student(UUID.randomUUID(), "name", "nae", "asf", "asfas"));
+            when(studentRepository1.findAll())
+                    .thenReturn(Arrays.asList(new Student(UUID.randomUUID(), "name1", "nae1", "asf1", "asfas1"),
+                            new Student(UUID.randomUUID(), "name2", "nae2", "asf2", "asfas2")));
+            return studentRepository1;
         }
 
         @Bean
-        UserService UserService(UserRepository userRepository){
-            return new UserService(userRepository);
+        StudentService UserService(StudentService userRepository){
+            return new StudentService(studentRepository());
         }
     }
 

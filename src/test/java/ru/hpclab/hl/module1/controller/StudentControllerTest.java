@@ -12,8 +12,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.hpclab.hl.module1.Application;
-import ru.hpclab.hl.module1.model.User;
-import ru.hpclab.hl.module1.repository.UserRepository;
+import ru.hpclab.hl.module1.model.Student;
+import ru.hpclab.hl.module1.repository.StudentRepository;
 
 
 import java.util.UUID;
@@ -26,23 +26,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = Application.class)
 @AutoConfigureMockMvc
-public class UserControllerTest {
+public class StudentControllerTest {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     private MockMvc mvc;
 
     @Autowired
-    private UserRepository userRepository;
+    private StudentRepository studentRepository;
 
     @BeforeEach
     public void init() {
-        userRepository.clear();
+        studentRepository.clear();
     }
 
     @Test
     public void get_should_returnUser_when_userExists() throws Exception {
-        User user = userRepository.save(new User(UUID.randomUUID(), "name"));
+        Student user = studentRepository.save(new Student(UUID.randomUUID(), "name", "afsdf", "asfas", "bio"));
         String expectedJson = objectMapper.writeValueAsString(user);
 
         mvc.perform(get("/users/" + user.getIdentifier()).accept(MediaType.APPLICATION_JSON))

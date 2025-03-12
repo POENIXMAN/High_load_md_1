@@ -1,14 +1,21 @@
 package ru.hpclab.hl.module1.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import org.springframework.lang.NonNull;
 
 import java.util.UUID;
 
 import java.util.Date;
 
+
+@Entity
 public class Student {
 
-    @NonNull
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID identifier;
     @NonNull
     private String FIO;
@@ -22,6 +29,10 @@ public class Student {
         this.FIO = FIO;
         this.className = className;
         this.dateOfBirth = new Date();
+    }
+
+    public Student() {
+
     }
 
     @NonNull

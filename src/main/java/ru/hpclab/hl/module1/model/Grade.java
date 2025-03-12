@@ -1,19 +1,26 @@
 package ru.hpclab.hl.module1.model;
 
+import jakarta.persistence.*;
 import org.springframework.lang.NonNull;
 
 import java.util.Date;
 import java.util.UUID;
 
+@Entity
 public class Grade {
 
 
-    @NonNull
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID gradeId;
-    @NonNull
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "student_id", nullable = false)
     private Student student;
-    @NonNull
-    private Subject aSubject;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "subject_id", nullable = false)
+    private Subject subject;
     @NonNull
     private int gradeValue;
     @NonNull
@@ -40,11 +47,11 @@ public class Grade {
 
     @NonNull
     public Subject getaSubject() {
-        return aSubject;
+        return subject;
     }
 
     public void setaSubject(@NonNull Subject aSubject) {
-        this.aSubject = aSubject;
+        this.subject = aSubject;
     }
 
     public int getGradeValue() {

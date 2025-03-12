@@ -1,6 +1,7 @@
 package ru.hpclab.hl.module1.service;
 
 import org.springframework.stereotype.Service;
+import ru.hpclab.hl.module1.controller.exeption.UserException;
 import ru.hpclab.hl.module1.model.Grade;
 import ru.hpclab.hl.module1.repository.GradeRepository;
 
@@ -23,7 +24,8 @@ public class GradeService {
     }
 
     public Grade getGradeById(String id) {
-        return gradeRepository.findById(UUID.fromString(id));
+        return gradeRepository.findById(UUID.fromString(id))
+                .orElseThrow(() -> new UserException("Grade with ID " + id + " not found"));
     }
 
     public Grade saveGrade(Grade grade) {
@@ -31,17 +33,19 @@ public class GradeService {
     }
 
     public void deleteGrade(String id) {
-        gradeRepository.delete(UUID.fromString(id));
+        gradeRepository.deleteById(UUID.fromString(id));
     }
 
     public Grade updateGrade(String id, Grade grade) {
         grade.setGradeId(UUID.fromString(id));
-        return gradeRepository.put(grade);
+        return gradeRepository.save(grade);
     }
 
-    public double calculateAverageGradeBySubjectAndYear(UUID studentId, UUID subjectId, int year) {
-        List<Grade> grades = gradeRepository.findByStudentIdentifierAndASubjectIdentifierAndGradingDateBetween(
-                studentId, subjectId, getStartOfYear(year), getEndOfYear(year));
+    public double calculateAverageGradeForClass(UUID subjectId, int year) {
+        Date startDate = getStartOfYear(year);
+        Date endDate = getEndOfYear(year);
+
+        List<Grade> grades = gradeRepository.findBySubjectAndGradingDateBetween(subjectId, startDate, endDate);
 
         if (grades.isEmpty()) {
             return 0.0;
@@ -50,6 +54,8 @@ public class GradeService {
         double sum = grades.stream().mapToInt(Grade::getGradeValue).sum();
         return sum / grades.size();
     }
+
+
 
     private Date getStartOfYear(int year) {
         Calendar calendar = Calendar.getInstance();

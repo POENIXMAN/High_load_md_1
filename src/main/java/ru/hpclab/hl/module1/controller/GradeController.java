@@ -46,12 +46,10 @@ public class GradeController {
         return gradeService.updateGrade(id, grade);
     }
 
-    @GetMapping("/average-grade")
-    public double getAverageGradeBySubjectAndYear(
-            @RequestParam UUID studentId,
-            @RequestParam UUID subjectId,
-            @RequestParam int year) {
-
-        return gradeService.calculateAverageGradeBySubjectAndYear(studentId, subjectId, year);
+    @GetMapping("/average/class/{subjectId}/year/{year}")
+    public double calculateAverageGradeForClass(
+            @PathVariable UUID subjectId,
+            @PathVariable int year) {
+        return gradeService.calculateAverageGradeForClass(subjectId, year);
     }
 }

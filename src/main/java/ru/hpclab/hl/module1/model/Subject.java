@@ -1,12 +1,18 @@
 package ru.hpclab.hl.module1.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import org.springframework.lang.NonNull;
 
 import java.util.UUID;
 
+@Entity
 public class Subject {
 
-    @NonNull
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID identifier;
     @NonNull
     private String className;
@@ -21,6 +27,10 @@ public class Subject {
         this.className = className;
         this.roomNumber = roomNumber;
         this.teacherName = teacherName;
+    }
+
+    public Subject() {
+
     }
 
     @NonNull

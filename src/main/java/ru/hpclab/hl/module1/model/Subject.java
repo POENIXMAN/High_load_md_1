@@ -1,11 +1,9 @@
 package ru.hpclab.hl.module1.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import org.springframework.lang.NonNull;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -20,6 +18,9 @@ public class Subject {
     private String teacherName;
     @NonNull
     private int roomNumber;
+
+    @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Grade> grades;
 
 
     public Subject(@NonNull UUID identifier, @NonNull String className, @NonNull String teacherName, int roomNumber) {

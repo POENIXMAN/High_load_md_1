@@ -14,11 +14,11 @@ public class Grade {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID gradeId;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "subject_id", nullable = false)
     private Subject subject;
     @NonNull

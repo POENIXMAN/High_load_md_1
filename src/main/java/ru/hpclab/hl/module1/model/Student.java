@@ -1,11 +1,9 @@
 package ru.hpclab.hl.module1.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import org.springframework.lang.NonNull;
 
+import java.util.List;
 import java.util.UUID;
 
 import java.util.Date;
@@ -23,6 +21,9 @@ public class Student {
     private String className;
     @NonNull
     private Date dateOfBirth;
+
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Grade> grades;
 
     public Student(@NonNull UUID identifier, @NonNull String FIO, @NonNull String className) {
         this.identifier = identifier;

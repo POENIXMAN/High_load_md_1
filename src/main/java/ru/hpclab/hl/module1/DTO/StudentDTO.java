@@ -12,7 +12,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StudentDTO {
-    private UUID identifier;
     private String FIO;
     private String className;
     private Date dateOfBirth;

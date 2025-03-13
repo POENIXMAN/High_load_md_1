@@ -1,25 +1,15 @@
 package ru.hpclab.hl.module1.model;
 
-import jakarta.persistence.*;
 import org.springframework.lang.NonNull;
 
 import java.util.Date;
 import java.util.UUID;
 
-@Entity
+
 public class Grade {
 
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID gradeId;
-
-    @ManyToOne
-    @JoinColumn(name = "student_id", nullable = false)
     private Student student;
-
-    @ManyToOne
-    @JoinColumn(name = "subject_id", nullable = false)
     private Subject subject;
     @NonNull
     private int gradeValue;

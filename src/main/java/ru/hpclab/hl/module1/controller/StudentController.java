@@ -1,7 +1,10 @@
 package ru.hpclab.hl.module1.controller;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.hpclab.hl.module1.DTO.StudentDTO;
+import ru.hpclab.hl.module1.Entity.StudentEntity;
 import ru.hpclab.hl.module1.model.Student;
 import ru.hpclab.hl.module1.service.StudentService;
 
@@ -13,18 +16,21 @@ public class StudentController {
 
     private final StudentService studentService;
 
+
+
+
     @Autowired
     public StudentController(StudentService studentService) {
         this.studentService = studentService;
     }
 
     @GetMapping
-    public List<Student> getStudents() {
+    public List<StudentDTO> getStudents() {
         return studentService.getAllStudents();
     }
 
     @GetMapping("/{id}")
-    public Student getStudentById(@PathVariable String id) {
+    public StudentDTO getStudentById(@PathVariable String id) {
         return studentService.getStudentById(id);
     }
 
@@ -34,12 +40,12 @@ public class StudentController {
     }
 
     @PostMapping(value = "/student")
-    public Student saveStudent(@RequestBody Student client) {
+    public StudentDTO saveStudent(@RequestBody StudentDTO client) {
         return studentService.saveStudent(client);
     }
 
     @PutMapping(value = "/{id}")
-    public Student updateStudent(@PathVariable(required = false) String id, @RequestBody Student student) {
+    public StudentDTO updateStudent(@PathVariable(required = false) String id, @RequestBody StudentDTO student) {
         return studentService.updateStudent(id, student);
     }
 

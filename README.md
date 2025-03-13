@@ -10,7 +10,6 @@
 
 Создать git repo и DockerHub registry
 Расшарить доступ для mmrovnyagin@gmail.com/rovn_m или сделать публичным git-репо
-Внести данные в таблицу https://docs.google.com/spreadsheets/d/1XEHl_LM9JRf6LXqhfKfPoXbKtudeKp7opYUAuyNK_mw/edit?gid=0#gid=0 
 
 
 ### LAB1 -- DONE

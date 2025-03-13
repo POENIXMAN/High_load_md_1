@@ -17,7 +17,7 @@ import ru.hpclab.hl.module1.repository.SubjectRepository;
 import java.util.Date;
 import java.util.UUID;
 
-@Configuration
+
 public class DataBaseInitializer {
 
     @Bean

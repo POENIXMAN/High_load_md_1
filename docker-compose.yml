@@ -1,29 +1,58 @@
+version: "3.9"
 
 services:
+  generate-data:
+    image: ${GENERATE_DATA_IMAGE:-python:3.10-slim}
+    container_name: ${GENERATE_DATA_CONTAINER_NAME:-school_journal_generate_data}
+    working_dir: /app
+    volumes:
+      - ./generate_data.py:/app/generate_data.py
+      - ./db-init:/app/db-init
+    command: >
+      sh -c "python generate_data.py && mv init.sql db-init/init.sql"
+    networks:
+      - app-network
+
   db:
-    image: postgres:15
-    container_name: school_journal_db
+    image: ${DB_IMAGE:-postgres:15}
+    container_name: ${DB_CONTAINER_NAME:-school_journal_db}
     environment:
-      POSTGRES_DB: school_journal
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${POSTGRES_DB:-school_journal}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     volumes:
       - db-data:/var/lib/postgresql/data
       - ./db-init/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-      - "5432:5432"
+      - "${DB_PORT:-5432}:5432"
+    depends_on:
+      - generate-data
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d school_journal" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   app:
-    image: school_journal_app
-    container_name: school_journal_app
+    image: ${APP_IMAGE:-school_journal_app}
+    container_name: ${APP_CONTAINER_NAME:-school_journal_app}
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/school_journal
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST:-db}:${DB_PORT:-5432}/${POSTGRES_DB:-school_journal}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:-postgres}
     ports:
-      - "8080:8080"
+      - "${APP_PORT:-8080}:8080"
+    networks:
+      - app-network
 
 volumes:
   db-data:
+
+networks:
+  app-network:

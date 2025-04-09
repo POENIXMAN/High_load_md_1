@@ -5,11 +5,7 @@ services:
     working_dir: /app
     volumes:
       - ./generate_faker_data.py:/app/generate_faker_data.py
-    command: >
-      sh -c "sleep 15 && pip install requests faker && 
-      python generate_faker_data.py --endpoint students --count 500 &&
-      python generate_faker_data.py --endpoint subjects --count 500 &&
-      python generate_faker_data.py --endpoint grades --count 500"
+
     networks:
       - app-network
     depends_on:

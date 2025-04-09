@@ -1,6 +1,7 @@
 package ru.hpclab.hl.module1.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hpclab.hl.module1.DTO.SubjectDTO;
 import ru.hpclab.hl.module1.model.Student;
@@ -31,7 +32,11 @@ public class SubjectController {
     }
 
 
-
+    @DeleteMapping("/clear")
+    public ResponseEntity<Void> clearAllSubjects(){
+        subjectService.clearAllSubjects();
+        return ResponseEntity.noContent().build();
+    }
     @DeleteMapping("/{id}")
     public void deleteSubject(@PathVariable String id) {
         subjectService.deleteSubject(id);

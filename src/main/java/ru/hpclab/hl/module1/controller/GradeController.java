@@ -32,6 +32,12 @@ public class GradeController {
         return gradeService.getGradeById(id);
     }
 
+    @DeleteMapping("/clear")
+    public ResponseEntity<Void> clearAllGrades(){
+        gradeService.clearAllGrades();
+        return ResponseEntity.noContent().build();
+    }
+
     @DeleteMapping("/{id}")
     public void deleteGrade(@PathVariable String id) {
         gradeService.deleteGrade(id);

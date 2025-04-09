@@ -69,4 +69,8 @@ public class StudentService {
     public void deleteAllStudents() {
         studentRepository.deleteAll();
     }
+
+    public void clearAllStudents() {
+        studentRepository.deleteAll();
+    }
 }

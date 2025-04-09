@@ -1,18 +1,32 @@
 import argparse
 import requests
 from faker import Faker
-import uuid
 import random
 from datetime import datetime, timedelta
 
 fake = Faker()
 
-def generate_students(count, endpoint):
-    base_url = "http://app:8080/students"
+BASE_URL = "http://localhost:8080"  # Changed from 'app' to 'localhost'
 
-    # Clear existing dat
+def clear_students():
+    print("Clearing all students...")
+    response = requests.delete(f"{BASE_URL}/students/clear")
+    response.raise_for_status()
 
-    # Generate new students
+def clear_subjects():
+    print("Clearing all subjects...")
+    response = requests.delete(f"{BASE_URL}/subjects/clear")
+    response.raise_for_status()
+
+def clear_grades():
+    print("Clearing all grades...")
+    response = requests.delete(f"{BASE_URL}/grades/clear")
+    response.raise_for_status()
+
+def generate_students(count, clear=False):
+    if clear:
+        clear_students()
+
     for i in range(count):
         student = {
             "fio": fake.name(),
@@ -21,16 +35,16 @@ def generate_students(count, endpoint):
         }
 
         print(f"Creating student {i+1}/{count}: {student['fio']}")
-        response = requests.post(f"{base_url}/student", json=student)
+        response = requests.post(f"{BASE_URL}/students/student", json=student)
         response.raise_for_status()
 
-def generate_subjects(count, endpoint):
-    base_url = "http://app:8080/subjects"  # Assuming you have a similar endpoint for subjects
-
+def generate_subjects(count, clear=False):
+    if clear:
+        clear_subjects()
 
     subjects = ["Mathematics", "Physics", "Chemistry", "Biology", "Literature", "History"]
 
-    for i in range(min(count, len(subjects))):  #
+    for i in range(min(count, len(subjects))):
         subject = {
             "className": subjects[i],
             "teacherName": fake.name(),
@@ -38,16 +52,15 @@ def generate_subjects(count, endpoint):
         }
 
         print(f"Creating subject {i+1}/{count}: {subject['className']}")
-        response = requests.post(f"{base_url}/subject", json=subject)
+        response = requests.post(f"{BASE_URL}/subjects/subject", json=subject)
         response.raise_for_status()
 
-def generate_grades(count, endpoint):
-    # First get existing students and subjects
-    students = requests.get("http://app:8080/students").json()
-    subjects = requests.get("http://app:8080/subjects").json()  # Adjust if your endpoint is different
+def generate_grades(count, clear=False):
+    if clear:
+        clear_grades()
 
-    base_url = "http://app:8080/grades"  # Assuming you have a grades endpoint
-
+    students = requests.get(f"{BASE_URL}/students").json()
+    subjects = requests.get(f"{BASE_URL}/subjects").json()
 
     for i in range(count):
         student = random.choice(students)
@@ -61,23 +74,43 @@ def generate_grades(count, endpoint):
         }
 
         print(f"Creating grade {i+1}/{count} for student {student['fio']}")
-        response = requests.post(f"{base_url}/grade", json=grade)
+        response = requests.post(f"{BASE_URL}/grades/grade", json=grade)
         response.raise_for_status()
 
 def main():
-    parser = argparse.ArgumentParser(description='Generate test data for school journal')
-    parser.add_argument('--count', type=int, default=500, help='Number of objects to create')
-    parser.add_argument('--endpoint', required=True, choices=['students', 'subjects', 'grades'],
-                       help='Endpoint to generate data for')
+    parser = argparse.ArgumentParser(description='Generate or clear test data for school journal')
+    parser.add_argument('--count', type=int, default=500, help='Number of objects to create (ignored if --clear is used alone)')
+    parser.add_argument('--endpoint', required=False,  # Made optional
+                       choices=['students', 'subjects', 'grades', 'all'],
+                       help='Endpoint to generate/clear data for (omit with --clear to only clear)')
+    parser.add_argument('--clear', action='store_true',
+                       help='Clear data for the specified endpoint (if no endpoint, clears everything)')
 
     args = parser.parse_args()
 
-    if args.endpoint == 'students':
-        generate_students(args.count, args.endpoint)
-    elif args.endpoint == 'subjects':
-        generate_subjects(args.count, args.endpoint)
-    elif args.endpoint == 'grades':
-        generate_grades(args.count, args.endpoint)
+    if args.clear:
+        if args.endpoint == 'all' or not args.endpoint:
+            clear_grades()
+            clear_subjects()
+            clear_students()
+        elif args.endpoint == 'students':
+            clear_students()
+        elif args.endpoint == 'subjects':
+            clear_subjects()
+        elif args.endpoint == 'grades':
+            clear_grades()
+
+    if args.endpoint and not args.clear:  # Only generate if --endpoint given and not --clear-only
+        if args.endpoint == 'all':
+            generate_students(args.count)
+            generate_subjects(args.count)
+            generate_grades(args.count)
+        elif args.endpoint == 'students':
+            generate_students(args.count)
+        elif args.endpoint == 'subjects':
+            generate_subjects(args.count)
+        elif args.endpoint == 'grades':
+            generate_grades(args.count)
 
 if __name__ == "__main__":
     main()

@@ -138,4 +138,8 @@ public class GradeService {
         calendar.set(year, Calendar.DECEMBER, 31, 23, 59, 59);
         return calendar.getTime();
     }
+
+    public void clearAllGrades() {
+        gradeRepository.deleteAll();
+    }
 }

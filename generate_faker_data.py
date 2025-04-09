@@ -79,17 +79,34 @@ def generate_grades(count, clear=False):
 
 def main():
     parser = argparse.ArgumentParser(description='Generate or clear test data for school journal')
-    parser.add_argument('--count', type=int, default=500, help='Number of objects to create (ignored if --clear is used alone)')
-    parser.add_argument('--endpoint', required=False,  # Made optional
+    parser.add_argument('--count', type=int, default=500,
+                       help='Number of objects to create (ignored with --clear or --clear-all)')
+    parser.add_argument('--endpoint', required=False,
                        choices=['students', 'subjects', 'grades', 'all'],
-                       help='Endpoint to generate/clear data for (omit with --clear to only clear)')
+                       help='Endpoint to target (required for generation or --clear)')
     parser.add_argument('--clear', action='store_true',
-                       help='Clear data for the specified endpoint (if no endpoint, clears everything)')
+                       help='ONLY clear data for specified endpoint (no generation)')
+    parser.add_argument('--clear-all', action='store_true',
+                       help='ONLY clear ALL data (no generation)')
+    parser.add_argument('--generate', action='store_true',
+                       help='Generate data after clearing (requires --endpoint)')
 
     args = parser.parse_args()
 
+    # --clear-all takes highest priority
+    if args.clear_all:
+        print("Clearing ALL data...")
+        clear_grades()
+        clear_subjects()
+        clear_students()
+        return
+
+    # --clear (single endpoint)
     if args.clear:
-        if args.endpoint == 'all' or not args.endpoint:
+        if not args.endpoint:
+            parser.error("--clear requires --endpoint")
+        if args.endpoint == 'all':
+            print("Clearing ALL data...")
             clear_grades()
             clear_subjects()
             clear_students()
@@ -99,8 +116,10 @@ def main():
             clear_subjects()
         elif args.endpoint == 'grades':
             clear_grades()
+        return  # Exit after clearing (no generation)
 
-    if args.endpoint and not args.clear:  # Only generate if --endpoint given and not --clear-only
+    # Data generation (requires --endpoint)
+    if args.endpoint:
         if args.endpoint == 'all':
             generate_students(args.count)
             generate_subjects(args.count)
@@ -111,6 +130,8 @@ def main():
             generate_subjects(args.count)
         elif args.endpoint == 'grades':
             generate_grades(args.count)
+    else:
+        parser.print_help()
 
 if __name__ == "__main__":
     main()

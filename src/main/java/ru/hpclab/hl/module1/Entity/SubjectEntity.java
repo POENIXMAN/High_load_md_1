@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
+@Table(name = "subject_entity")
 public class SubjectEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

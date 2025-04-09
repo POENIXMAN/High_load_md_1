@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @Entity
+@Table(name = "grade_entity")
 public class GradeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -65,5 +66,9 @@ public class GradeEntity {
 
     public SubjectEntity getSubjectEntity() {
         return subjectEntity;
+    }
+
+    public void setSubjectEntity(SubjectEntity subjectEntity) {
+        this.subjectEntity = subjectEntity;
     }
 }

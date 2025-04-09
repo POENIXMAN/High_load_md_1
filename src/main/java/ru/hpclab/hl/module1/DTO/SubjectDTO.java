@@ -13,6 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SubjectDTO {
+    private UUID subjectId;
     private String className;
     private String teacherName;
     private int roomNumber;

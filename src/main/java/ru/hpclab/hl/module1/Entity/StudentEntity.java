@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
+@Table(name = "student_entity")
 public class StudentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

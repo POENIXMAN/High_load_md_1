@@ -1,20 +1,24 @@
-version: "3.9"
-
 services:
   generate-data:
     image: ${GENERATE_DATA_IMAGE:-python:3.10-slim}
     container_name: ${GENERATE_DATA_CONTAINER_NAME:-school_journal_generate_data}
     working_dir: /app
     volumes:
-      - ./generate_data.py:/app/generate_data.py
-      - ./db-init:/app/db-init
+      - ./generate_faker_data.py:/app/generate_faker_data.py
+#      - ./db-init:/app/db-init
     command: >
-      sh -c "python generate_data.py && mv init.sql db-init/init.sql"
+      sh -c "pip install requests faker && 
+      python generate_faker_data.py --endpoint students --count 500 &&
+      python generate_faker_data.py --endpoint subjects --count 500 &&
+      python generate_faker_data.py --endpoint grades --count 500"
     networks:
       - app-network
+    depends_on:
+      app:
+        condition: service_healthy
 
   db:
-    image: ${DB_IMAGE:-postgres:15}
+    image: ${DB_IMAGE:-postgres:15-alpine}
     container_name: ${DB_CONTAINER_NAME:-school_journal_db}
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-school_journal}
@@ -22,11 +26,8 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     volumes:
       - db-data:/var/lib/postgresql/data
-      - ./db-init/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "${DB_PORT:-5432}:5432"
-    depends_on:
-      - generate-data
     networks:
       - app-network
     healthcheck:
@@ -46,10 +47,17 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST:-db}:${DB_PORT:-5432}/${POSTGRES_DB:-school_journal}
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME:-postgres}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:-postgres}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
     ports:
-      - "${APP_PORT:-8080}:8080"
+      - "8080:8080"
     networks:
       - app-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
 volumes:
   db-data:

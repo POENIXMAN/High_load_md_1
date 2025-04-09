@@ -30,6 +30,8 @@ public class SubjectController {
         return subjectService.getSubjectById(id);
     }
 
+
+
     @DeleteMapping("/{id}")
     public void deleteSubject(@PathVariable String id) {
         subjectService.deleteSubject(id);

@@ -70,4 +70,8 @@ public class SubjectService {
 
         return createSubjectDTO(updatedEntity);
     }
+
+    public void clearAllSubjects() {
+        subjectRepository.deleteAll();
+    }
 }

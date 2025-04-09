@@ -5,17 +5,15 @@ services:
     working_dir: /app
     volumes:
       - ./generate_faker_data.py:/app/generate_faker_data.py
-#      - ./db-init:/app/db-init
     command: >
-      sh -c "pip install requests faker && 
+      sh -c "sleep 15 && pip install requests faker && 
       python generate_faker_data.py --endpoint students --count 500 &&
       python generate_faker_data.py --endpoint subjects --count 500 &&
       python generate_faker_data.py --endpoint grades --count 500"
     networks:
       - app-network
     depends_on:
-      app:
-        condition: service_healthy
+      - app
 
   db:
     image: ${DB_IMAGE:-postgres:15-alpine}
@@ -52,12 +50,6 @@ services:
       - "8080:8080"
     networks:
       - app-network
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 30s
 
 volumes:
   db-data:

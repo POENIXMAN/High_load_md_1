@@ -1,19 +1,17 @@
-package ru.hpclab.hl.module1.model;
+package ru.hpclab.hl.module1.Entity;
 
 import jakarta.persistence.*;
 import org.springframework.lang.NonNull;
-import ru.hpclab.hl.module1.Entity.GradeEntity;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import java.util.Date;
-
-
-
-public class Student {
-
-
+@Entity
+@Table(name = "student_entity")
+public class StudentEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID identifier;
     @NonNull
     private String FIO;
@@ -22,26 +20,14 @@ public class Student {
     @NonNull
     private Date dateOfBirth;
 
+    @OneToMany(mappedBy = "studentEntity", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<GradeEntity> grades;
 
-    private List<Grade> grades;
-
-    public Student(@NonNull UUID identifier, @NonNull String FIO, @NonNull String className) {
-        this.identifier = identifier;
-        this.FIO = FIO;
-        this.className = className;
-        this.dateOfBirth = new Date();
-    }
-
-    public Student() {
-
-    }
-
-    @NonNull
     public UUID getIdentifier() {
         return identifier;
     }
 
-    public void setIdentifier(@NonNull UUID identifier) {
+    public void setIdentifier(UUID identifier) {
         this.identifier = identifier;
     }
 
@@ -54,12 +40,11 @@ public class Student {
         this.FIO = FIO;
     }
 
-    @NonNull
     public String getClassName() {
         return className;
     }
 
-    public void setClassName(@NonNull String className) {
+    public void setClassName(String className) {
         this.className = className;
     }
 
@@ -72,9 +57,15 @@ public class Student {
         this.dateOfBirth = dateOfBirth;
     }
 
-    @Override
-    public String toString() {
-        return "Студент: " + identifier + ", " + FIO + ", " + className + ", " + dateOfBirth;
+    public List<GradeEntity> getGrades() {
+        return grades;
+    }
 
+    public void setGrades(List<GradeEntity> grades) {
+        this.grades = grades;
+    }
+
+    public UUID getStudentId() {
+        return identifier;
     }
 }

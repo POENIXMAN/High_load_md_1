@@ -2,24 +2,23 @@ package ru.hpclab.hl.module1.model;
 
 import jakarta.persistence.*;
 import org.springframework.lang.NonNull;
+import ru.hpclab.hl.module1.Entity.GradeEntity;
 
 import java.util.List;
 import java.util.UUID;
 
-@Entity
+
 public class Subject {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+
     private UUID identifier;
     @NonNull
     private String className;
     @NonNull
     private String teacherName;
-    @NonNull
+
     private int roomNumber;
 
-    @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Grade> grades;
 
 

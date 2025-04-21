@@ -1,0 +1,51 @@
+services:
+  db:
+    image: ${DB_IMAGE}
+    container_name: ${DB_CONTAINER_NAME}
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "${DB_PORT}:5432"
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U  ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  app:
+    image: ${APP_IMAGE}
+    container_name: ${APP_CONTAINER_NAME}
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST:-db}:${DB_PORT}/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+      SERVER_TOMCAT_THREADS_MAX: ${TOMCAT_THREADS_MAX}
+      SERVER_TOMCAT_THREADS_MIN_SPARE: ${TOMCAT_THREADS_MIN_SPARE}
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+
+volumes:
+  db-data:
+
+networks:
+  app-network:

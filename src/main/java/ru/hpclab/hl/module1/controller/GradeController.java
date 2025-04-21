@@ -3,6 +3,7 @@ package ru.hpclab.hl.module1.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.hpclab.hl.module1.DTO.GradeDTO;
 import ru.hpclab.hl.module1.model.Grade;
 import ru.hpclab.hl.module1.model.Student;
 import ru.hpclab.hl.module1.service.GradeService;
@@ -22,13 +23,19 @@ public class GradeController {
     }
 
     @GetMapping
-    public List<Grade> getUsers() {
+    public List<GradeDTO> getGrades() {
         return gradeService.getAllGrades();
     }
 
     @GetMapping("/{id}")
-    public Grade getGradeById(@PathVariable String id) {
+    public GradeDTO getGradeById(@PathVariable String id) {
         return gradeService.getGradeById(id);
+    }
+
+    @DeleteMapping("/clear")
+    public ResponseEntity<Void> clearAllGrades(){
+        gradeService.clearAllGrades();
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
@@ -37,12 +44,12 @@ public class GradeController {
     }
 
     @PostMapping(value = "/grade")
-    public Grade saveGrade(@RequestBody Grade grade) {
+    public GradeDTO saveGrade(@RequestBody GradeDTO grade) {
         return gradeService.saveGrade(grade);
     }
 
     @PutMapping(value = "/{id}")
-    public Grade updateGrade(@PathVariable(required = false) String id, @RequestBody Grade grade) {
+    public GradeDTO updateGrade(@PathVariable(required = false) String id, @RequestBody GradeDTO grade) {
         return gradeService.updateGrade(id, grade);
     }
 

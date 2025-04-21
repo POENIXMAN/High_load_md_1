@@ -1,42 +1,38 @@
 services:
   db:
-    image: ${DB_IMAGE:-postgres:15-alpine}
-    container_name: ${DB_CONTAINER_NAME:-school_journal_db}
+    image: ${DB_IMAGE}
+    container_name: ${DB_CONTAINER_NAME}
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-school_journal}
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - db-data:/var/lib/postgresql/data
     ports:
-      - "${DB_PORT:-5432}:5432"
+      - "${DB_PORT}:5432"
     networks:
       - app-network
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres -d school_journal" ]
+      test: [ "CMD-SHELL", "pg_isready -U  ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 10s
 
   app:
-    image: ${APP_IMAGE:-school_journal_app}
-    container_name: ${APP_CONTAINER_NAME:-school_journal_app}
+    image: ${APP_IMAGE}
+    container_name: ${APP_CONTAINER_NAME}
     depends_on:
       db:
         condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST:-db}:${DB_PORT:-5432}/${POSTGRES_DB:-school_journal}
-      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME:-postgres}
-      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:-postgres}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST:-db}:${DB_PORT}/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
 
-      SERVER_TOMCAT_THREADS_MAX: ${TOMCAT_THREADS_MAX:-200}
-      SERVER_TOMCAT_THREADS_MIN_SPARE: ${TOMCAT_THREADS_MIN_SPAR:-10}
-
-      SPRING_JPA_SHOW_SQL: ${SPRING_JPA_SHOW_SQL:-false}
-
-
+      SERVER_TOMCAT_THREADS_MAX: ${TOMCAT_THREADS_MAX}
+      SERVER_TOMCAT_THREADS_MIN_SPARE: ${TOMCAT_THREADS_MIN_SPARE}
     ports:
       - "8080:8080"
     networks:

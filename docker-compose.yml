@@ -18,12 +18,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 512M
-
 
   app:
     image: ${APP_IMAGE:-school_journal_app}

@@ -1,16 +1,4 @@
 services:
-  generate-data:
-    image: ${GENERATE_DATA_IMAGE:-python:3.10-slim}
-    container_name: ${GENERATE_DATA_CONTAINER_NAME:-school_journal_generate_data}
-    working_dir: /app
-    volumes:
-      - ./generate_faker_data.py:/app/generate_faker_data.py
-
-    networks:
-      - app-network
-    depends_on:
-      - app
-
   db:
     image: ${DB_IMAGE:-postgres:15-alpine}
     container_name: ${DB_CONTAINER_NAME:-school_journal_db}
@@ -30,6 +18,12 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
 
   app:
     image: ${APP_IMAGE:-school_journal_app}
@@ -42,10 +36,20 @@ services:
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME:-postgres}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:-postgres}
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+      SERVER_TOMCAT_THREADS_MAX: ${TOMCAT_THREADS_MAX:-200}
+      SERVER_TOMCAT_THREADS_MIN_SPARE: ${TOMCAT_THREADS_MIN_SPAR:-10}
+
     ports:
       - "8080:8080"
     networks:
       - app-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
 
 volumes:
   db-data:

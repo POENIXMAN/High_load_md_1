@@ -40,6 +40,9 @@ services:
       SERVER_TOMCAT_THREADS_MAX: ${TOMCAT_THREADS_MAX:-200}
       SERVER_TOMCAT_THREADS_MIN_SPARE: ${TOMCAT_THREADS_MIN_SPAR:-10}
 
+      SPRING_JPA_SHOW_SQL: ${SPRING_JPA_SHOW_SQL:-false}
+
+
     ports:
       - "8080:8080"
     networks:

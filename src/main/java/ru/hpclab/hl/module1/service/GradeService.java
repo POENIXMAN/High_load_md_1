@@ -1,23 +1,18 @@
 package ru.hpclab.hl.module1.service;
 
-import jakarta.annotation.PostConstruct;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.ModelMap;
+import ru.hpclab.hl.module1.CalculationServiceClient;
 import ru.hpclab.hl.module1.DTO.GradeDTO;
 import ru.hpclab.hl.module1.Entity.GradeEntity;
 import ru.hpclab.hl.module1.Entity.StudentEntity;
 import ru.hpclab.hl.module1.Entity.SubjectEntity;
 import ru.hpclab.hl.module1.controller.exeption.UserException;
-import ru.hpclab.hl.module1.model.Grade;
 import ru.hpclab.hl.module1.repository.GradeRepository;
 import ru.hpclab.hl.module1.repository.StudentRepository;
 import ru.hpclab.hl.module1.repository.SubjectRepository;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -25,26 +20,26 @@ import java.util.stream.Collectors;
 
 @Service
 public class GradeService {
-//    private final GradeRepository gradeRepository;
-//    @Autowired
-//    private ModelMapper modelMapper;
-
     private final GradeRepository gradeRepository;
     private final StudentRepository studentRepository;
     private final SubjectRepository subjectRepository;
     private final ModelMapper modelMapper;
+
+    private final CalculationServiceClient calculationServiceClient;
 
     @Autowired
     public GradeService(
             GradeRepository gradeRepository,
             StudentRepository studentRepository,
             SubjectRepository subjectRepository,
-            ModelMapper modelMapper
+            ModelMapper modelMapper,
+            CalculationServiceClient calculationServiceClient
     ) {
         this.gradeRepository = gradeRepository;
         this.studentRepository = studentRepository;
         this.subjectRepository = subjectRepository;
         this.modelMapper = modelMapper;
+        this.calculationServiceClient = calculationServiceClient;
     }
 
     private GradeEntity convertToEntity(GradeDTO gradeDTO) {
@@ -64,9 +59,7 @@ public class GradeService {
         return gradeEntity;
     }
 
-//    private GradeEntity convertToEntity(GradeDTO gradeDTO) {
-//        return modelMapper.map(gradeDTO, GradeEntity.class);
-//    }
+
 
     public GradeDTO convertToDTO(GradeEntity gradeEntity) {
         GradeDTO gradeDTO = new GradeDTO();
@@ -76,11 +69,6 @@ public class GradeService {
         gradeDTO.setGradingDate(gradeEntity.getGradingDate());
         return gradeDTO;
     }
-
-//    public GradeService(GradeRepository gradeRepository) {
-//        this.gradeRepository = gradeRepository;
-//    }
-
 
 
     public List<GradeDTO> getAllGrades() {
@@ -112,32 +100,35 @@ public class GradeService {
     }
 
     public double calculateAverageGradeForClass(UUID subjectId, int year) {
-        Date startDate = getStartOfYear(year);
-        Date endDate = getEndOfYear(year);
-
-        List<GradeEntity> grades = gradeRepository.findBySubjectAndGradingDateBetween(subjectId, startDate, endDate);
-
-        if (grades.isEmpty()) {
-            return 0.0;
-        }
-
-        double sum = grades.stream().mapToInt(GradeEntity::getGradeValue).sum();
-        return sum / grades.size();
+        return calculationServiceClient.calculateAverageGradeForClass(subjectId, year);
     }
-
-
-
-    private Date getStartOfYear(int year) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(year, Calendar.JANUARY, 1, 0, 0, 0);
-        return calendar.getTime();
-    }
-
-    private Date getEndOfYear(int year) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(year, Calendar.DECEMBER, 31, 23, 59, 59);
-        return calendar.getTime();
-    }
+//    public double calculateAverageGradeForClass(UUID subjectId, int year) {
+//        Date startDate = getStartOfYear(year);
+//        Date endDate = getEndOfYear(year);
+//
+//        List<GradeEntity> grades = gradeRepository.findBySubjectAndGradingDateBetween(subjectId, startDate, endDate);
+//
+//        if (grades.isEmpty()) {
+//            return 0.0;
+//        }
+//
+//        double sum = grades.stream().mapToInt(GradeEntity::getGradeValue).sum();
+//        return sum / grades.size();
+//    }
+//
+//
+//
+//    private Date getStartOfYear(int year) {
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.set(year, Calendar.JANUARY, 1, 0, 0, 0);
+//        return calendar.getTime();
+//    }
+//
+//    private Date getEndOfYear(int year) {
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.set(year, Calendar.DECEMBER, 31, 23, 59, 59);
+//        return calendar.getTime();
+//    }
 
     public void clearAllGrades() {
         gradeRepository.deleteAll();

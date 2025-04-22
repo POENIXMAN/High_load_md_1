@@ -14,10 +14,10 @@ import java.util.*;
 public interface GradeRepository extends JpaRepository<GradeEntity, UUID> {
 
 
-    @Query("SELECT g FROM GradeEntity g WHERE g.subjectEntity.identifier = :subjectId " +
-            "AND g.gradingDate BETWEEN :startDate AND :endDate")
-    List<GradeEntity> findBySubjectAndGradingDateBetween(
-            @Param("subjectId") UUID subjectId,
-            @Param("startDate") Date startDate,
-            @Param("endDate") Date endDate);
+//    @Query("SELECT g FROM GradeEntity g WHERE g.subjectEntity.identifier = :subjectId " +
+//            "AND g.gradingDate BETWEEN :startDate AND :endDate")
+//    List<GradeEntity> findBySubjectAndGradingDateBetween(
+//            @Param("subjectId") UUID subjectId,
+//            @Param("startDate") Date startDate,
+//            @Param("endDate") Date endDate);
 }

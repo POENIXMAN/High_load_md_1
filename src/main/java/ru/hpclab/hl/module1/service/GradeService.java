@@ -2,8 +2,9 @@ package ru.hpclab.hl.module1.service;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import ru.hpclab.hl.module1.CalculationServiceClient;
+import org.springframework.web.client.RestTemplate;
 import ru.hpclab.hl.module1.DTO.GradeDTO;
 import ru.hpclab.hl.module1.Entity.GradeEntity;
 import ru.hpclab.hl.module1.Entity.StudentEntity;
@@ -25,21 +26,25 @@ public class GradeService {
     private final SubjectRepository subjectRepository;
     private final ModelMapper modelMapper;
 
-    private final CalculationServiceClient calculationServiceClient;
+    private final   RestTemplate restTemplate;
+    private final String calculationServiceUrl;
 
     @Autowired
-    public GradeService(
+    public GradeService (
             GradeRepository gradeRepository,
             StudentRepository studentRepository,
             SubjectRepository subjectRepository,
             ModelMapper modelMapper,
-            CalculationServiceClient calculationServiceClient
+            @Value("${calculation.service.url}") String calculationServiceUrl,
+             RestTemplate restTemplate
+
     ) {
         this.gradeRepository = gradeRepository;
         this.studentRepository = studentRepository;
         this.subjectRepository = subjectRepository;
         this.modelMapper = modelMapper;
-        this.calculationServiceClient = calculationServiceClient;
+        this.calculationServiceUrl = calculationServiceUrl;
+        this.restTemplate = restTemplate;
     }
 
     private GradeEntity convertToEntity(GradeDTO gradeDTO) {
@@ -100,7 +105,12 @@ public class GradeService {
     }
 
     public double calculateAverageGradeForClass(UUID subjectId, int year) {
-        return calculationServiceClient.calculateAverageGradeForClass(subjectId, year);
+        return restTemplate.getForObject(
+                calculationServiceUrl + "/calculations/average/class/{subjectId}/year/{year}",
+                Double.class,
+                subjectId,
+                year
+        );
     }
 //    public double calculateAverageGradeForClass(UUID subjectId, int year) {
 //        Date startDate = getStartOfYear(year);

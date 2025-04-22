@@ -33,9 +33,6 @@ dependencies {
     implementation 'org.projectlombok:lombok:1.18.36'
     annotationProcessor 'org.projectlombok:lombok:1.18.36'
 
-    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
-
-    implementation platform('org.springframework.cloud:spring-cloud-dependencies:2023.0.0')
 
 }
 

@@ -26,9 +26,6 @@ services:
   calculation-service:
     image: ${CALC_APP_IMAGE}
     container_name: ${CALC_APP_CONTAINER_NAME}
-    depends_on:
-      db:
-        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${POSTGRES_DB}
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}

@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hpclab.hl.module1.DTO.GradeDTO;
-import ru.hpclab.hl.module1.model.Grade;
-import ru.hpclab.hl.module1.model.Student;
+
+
 import ru.hpclab.hl.module1.service.GradeService;
 import ru.hpclab.hl.module1.service.StudentService;
 
@@ -57,6 +57,7 @@ public class GradeController {
     public double calculateAverageGradeForClass(
             @PathVariable UUID subjectId,
             @PathVariable int year) {
+        System.out.println("Received calculation request for subject " + subjectId + " and year " + year);
         return gradeService.calculateAverageGradeForClass(subjectId, year);
     }
 }

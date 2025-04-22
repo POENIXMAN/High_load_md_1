@@ -1,10 +1,18 @@
 package ru.hpclab.hl.module1.service;
 
+import org.apache.juli.logging.Log;
+import org.hibernate.service.spi.ServiceException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 import ru.hpclab.hl.module1.DTO.GradeDTO;
 import ru.hpclab.hl.module1.Entity.GradeEntity;
 import ru.hpclab.hl.module1.Entity.StudentEntity;
@@ -14,8 +22,8 @@ import ru.hpclab.hl.module1.repository.GradeRepository;
 import ru.hpclab.hl.module1.repository.StudentRepository;
 import ru.hpclab.hl.module1.repository.SubjectRepository;
 
-import java.util.List;
-import java.util.UUID;
+import java.net.http.HttpHeaders;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -105,12 +113,25 @@ public class GradeService {
     }
 
     public double calculateAverageGradeForClass(UUID subjectId, int year) {
-        return restTemplate.getForObject(
-                calculationServiceUrl + "/calculations/average/class/{subjectId}/year/{year}",
-                Double.class,
-                subjectId,
-                year
-        );
+        try {
+            String url = calculationServiceUrl + "/calculations/average/class/{subjectId}/year/{year}";
+
+            Map<String, Object> uriVariables = new HashMap<>();
+            uriVariables.put("subjectId", subjectId.toString());
+            uriVariables.put("year", year);
+
+            ResponseEntity<Double> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    null,
+                    Double.class,
+                    uriVariables
+            );
+
+            return response.getBody();
+        } catch (HttpClientErrorException e) {
+            throw new ServiceException("Failed to calculate average grade", e);
+        }
     }
 //    public double calculateAverageGradeForClass(UUID subjectId, int year) {
 //        Date startDate = getStartOfYear(year);

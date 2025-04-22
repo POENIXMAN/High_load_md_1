@@ -52,12 +52,4 @@ public class GradeController {
     public GradeDTO updateGrade(@PathVariable(required = false) String id, @RequestBody GradeDTO grade) {
         return gradeService.updateGrade(id, grade);
     }
-
-    @GetMapping("/average/class/{subjectId}/year/{year}")
-    public double calculateAverageGradeForClass(
-            @PathVariable UUID subjectId,
-            @PathVariable int year) {
-        System.out.println("Received calculation request for subject " + subjectId + " and year " + year);
-        return gradeService.calculateAverageGradeForClass(subjectId, year);
-    }
 }

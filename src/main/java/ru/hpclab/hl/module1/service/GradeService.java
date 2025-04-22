@@ -34,25 +34,19 @@ public class GradeService {
     private final SubjectRepository subjectRepository;
     private final ModelMapper modelMapper;
 
-    private final   RestTemplate restTemplate;
-    private final String calculationServiceUrl;
 
     @Autowired
     public GradeService (
             GradeRepository gradeRepository,
             StudentRepository studentRepository,
             SubjectRepository subjectRepository,
-            ModelMapper modelMapper,
-            @Value("${calculation.service.url}") String calculationServiceUrl,
-             RestTemplate restTemplate
+            ModelMapper modelMapper
 
     ) {
         this.gradeRepository = gradeRepository;
         this.studentRepository = studentRepository;
         this.subjectRepository = subjectRepository;
         this.modelMapper = modelMapper;
-        this.calculationServiceUrl = calculationServiceUrl;
-        this.restTemplate = restTemplate;
     }
 
     private GradeEntity convertToEntity(GradeDTO gradeDTO) {
@@ -112,54 +106,6 @@ public class GradeService {
         return  convertToDTO( gradeRepository.save(entity));
     }
 
-    public double calculateAverageGradeForClass(UUID subjectId, int year) {
-        try {
-            String url = calculationServiceUrl + "/calculations/average/class/{subjectId}/year/{year}";
-
-            Map<String, Object> uriVariables = new HashMap<>();
-            uriVariables.put("subjectId", subjectId.toString());
-            uriVariables.put("year", year);
-
-            ResponseEntity<Double> response = restTemplate.exchange(
-                    url,
-                    HttpMethod.GET,
-                    null,
-                    Double.class,
-                    uriVariables
-            );
-
-            return response.getBody();
-        } catch (HttpClientErrorException e) {
-            throw new ServiceException("Failed to calculate average grade", e);
-        }
-    }
-//    public double calculateAverageGradeForClass(UUID subjectId, int year) {
-//        Date startDate = getStartOfYear(year);
-//        Date endDate = getEndOfYear(year);
-//
-//        List<GradeEntity> grades = gradeRepository.findBySubjectAndGradingDateBetween(subjectId, startDate, endDate);
-//
-//        if (grades.isEmpty()) {
-//            return 0.0;
-//        }
-//
-//        double sum = grades.stream().mapToInt(GradeEntity::getGradeValue).sum();
-//        return sum / grades.size();
-//    }
-//
-//
-//
-//    private Date getStartOfYear(int year) {
-//        Calendar calendar = Calendar.getInstance();
-//        calendar.set(year, Calendar.JANUARY, 1, 0, 0, 0);
-//        return calendar.getTime();
-//    }
-//
-//    private Date getEndOfYear(int year) {
-//        Calendar calendar = Calendar.getInstance();
-//        calendar.set(year, Calendar.DECEMBER, 31, 23, 59, 59);
-//        return calendar.getTime();
-//    }
 
     public void clearAllGrades() {
         gradeRepository.deleteAll();

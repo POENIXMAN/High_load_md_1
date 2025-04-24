@@ -84,10 +84,13 @@ public class ObservabilityService {
 
         public StatsResult getStats(long currentTime, long period) {
             long threshold = currentTime - period;
-            List<Long> recentDurations = records.stream()
-                    .filter(r -> r.timestamp >= threshold)
-                    .map(r -> r.duration)
-                    .toList();
+            List<Long> recentDurations;
+            synchronized (this) {
+                recentDurations = new ArrayList<>(records).stream()
+                        .filter(r -> r.timestamp >= threshold)
+                        .map(r -> r.duration)
+                        .toList();
+            }
 
             if (recentDurations.isEmpty()) {
                 return new StatsResult(0, 0, 0, 0);

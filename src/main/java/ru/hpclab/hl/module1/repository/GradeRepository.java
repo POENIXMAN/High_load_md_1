@@ -20,4 +20,9 @@ public interface GradeRepository extends JpaRepository<GradeEntity, UUID> {
             @Param("subjectId") UUID subjectId,
             @Param("startDate") Date startDate,
             @Param("endDate") Date endDate);
+
+    @Query("SELECT g FROM GradeEntity g WHERE g.gradingDate BETWEEN :startDate AND :endDate")
+    List<GradeEntity> findByGradingDateBetween(
+            @Param("startDate") Date startDate,
+            @Param("endDate") Date endDate);
 }

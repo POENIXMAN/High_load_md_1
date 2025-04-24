@@ -16,10 +16,7 @@ import ru.hpclab.hl.module1.repository.GradeRepository;
 import ru.hpclab.hl.module1.repository.StudentRepository;
 import ru.hpclab.hl.module1.repository.SubjectRepository;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -141,5 +138,30 @@ public class GradeService {
 
     public void clearAllGrades() {
         gradeRepository.deleteAll();
+    }
+
+    public Map<UUID, Double> calculateAverageGradesForYear(int year) {
+        Date startDate = getStartOfYear(year);
+        Date endDate = getEndOfYear(year);
+
+        // Get all grades in the given year
+        List<GradeEntity> grades = gradeRepository.findByGradingDateBetween(startDate, endDate);
+
+        // Group grades by subject
+        Map<UUID, List<GradeEntity>> gradesBySubject = grades.stream()
+                .collect(Collectors.groupingBy(g -> g.getSubjectEntity().getIdentifier()));
+
+        // Calculate average for each subject
+        Map<UUID, Double> averages = new HashMap<>();
+        for (Map.Entry<UUID, List<GradeEntity>> entry : gradesBySubject.entrySet()) {
+            UUID subjectId = entry.getKey();
+            List<GradeEntity> subjectGrades = entry.getValue();
+            double average = subjectGrades.stream()
+                    .mapToInt(GradeEntity::getGradeValue)
+                    .average()
+                    .orElse(0.0);  // If there are no grades, the average is 0
+            averages.put(subjectId, average);
+        }
+        return averages;
     }
 }

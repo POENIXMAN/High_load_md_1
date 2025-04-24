@@ -4,22 +4,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hpclab.hl.module1.DTO.GradeDTO;
-import ru.hpclab.hl.module1.model.Grade;
-import ru.hpclab.hl.module1.model.Student;
 import ru.hpclab.hl.module1.service.GradeService;
-import ru.hpclab.hl.module1.service.StudentService;
+import ru.hpclab.hl.module1.service.ObservabilityService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/grades")
 public class GradeController {
     private final GradeService gradeService;
+    private final ObservabilityService observabilityService;
 
     @Autowired
-    public GradeController(GradeService gradeService) {
+    public GradeController(GradeService gradeService, ObservabilityService observabilityService) {
         this.gradeService = gradeService;
+        this.observabilityService = observabilityService;
     }
 
     @GetMapping
@@ -33,7 +34,7 @@ public class GradeController {
     }
 
     @DeleteMapping("/clear")
-    public ResponseEntity<Void> clearAllGrades(){
+    public ResponseEntity<Void> clearAllGrades() {
         gradeService.clearAllGrades();
         return ResponseEntity.noContent().build();
     }
@@ -53,10 +54,23 @@ public class GradeController {
         return gradeService.updateGrade(id, grade);
     }
 
-    @GetMapping("/average/class/{subjectId}/year/{year}")
-    public double calculateAverageGradeForClass(
-            @PathVariable UUID subjectId,
-            @PathVariable int year) {
-        return gradeService.calculateAverageGradeForClass(subjectId, year);
+//    @GetMapping("/average/class/{subjectId}/year/{year}")
+//    public double calculateAverageGradeForClass(
+//            @PathVariable UUID subjectId,
+//            @PathVariable int year) {
+//
+//        return gradeService.calculateAverageGradeForClass(subjectId, year);
+//    }
+
+    @GetMapping("/average/year/{year}")
+    public Map<UUID, Double> calculateAverageGradesForYear(@PathVariable int year) {
+        observabilityService.start("controller.calculateAverageGradesForAllClasses");
+        try {
+            return gradeService.calculateAverageGradesForYear(year);
+        } finally {
+            observabilityService.stop("controller.calculateAverageGradesForAllClasses");
+        }
     }
 }
+
+

@@ -1,17 +1,13 @@
 package ru.hpclab.hl.module1.service;
 
-import jakarta.annotation.PostConstruct;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.ModelMap;
 import ru.hpclab.hl.module1.DTO.GradeDTO;
 import ru.hpclab.hl.module1.Entity.GradeEntity;
 import ru.hpclab.hl.module1.Entity.StudentEntity;
 import ru.hpclab.hl.module1.Entity.SubjectEntity;
 import ru.hpclab.hl.module1.controller.exeption.UserException;
-import ru.hpclab.hl.module1.model.Grade;
 import ru.hpclab.hl.module1.repository.GradeRepository;
 import ru.hpclab.hl.module1.repository.StudentRepository;
 import ru.hpclab.hl.module1.repository.SubjectRepository;
@@ -30,18 +26,20 @@ public class GradeService {
     private final StudentRepository studentRepository;
     private final SubjectRepository subjectRepository;
     private final ModelMapper modelMapper;
+    private final ObservabilityService observabilityService;
 
     @Autowired
     public GradeService(
             GradeRepository gradeRepository,
             StudentRepository studentRepository,
             SubjectRepository subjectRepository,
-            ModelMapper modelMapper
+            ModelMapper modelMapper, ObservabilityService observabilityService
     ) {
         this.gradeRepository = gradeRepository;
         this.studentRepository = studentRepository;
         this.subjectRepository = subjectRepository;
         this.modelMapper = modelMapper;
+        this.observabilityService = observabilityService;
     }
 
     private GradeEntity convertToEntity(GradeDTO gradeDTO) {
@@ -79,7 +77,6 @@ public class GradeService {
 //    }
 
 
-
     public List<GradeDTO> getAllGrades() {
         return gradeRepository.findAll().stream()
                 .map(this::convertToDTO)
@@ -88,14 +85,14 @@ public class GradeService {
 
 
     public GradeDTO getGradeById(String id) {
-        GradeEntity entity =  gradeRepository.findById(UUID.fromString(id))
+        GradeEntity entity = gradeRepository.findById(UUID.fromString(id))
                 .orElseThrow(() -> new UserException("Grade with ID " + id + " not found"));
         return convertToDTO(entity);
     }
 
     public GradeDTO saveGrade(GradeDTO grade) {
         GradeEntity entity = convertToEntity(grade);
-        return convertToDTO( gradeRepository.save(entity));
+        return convertToDTO(gradeRepository.save(entity));
     }
 
     public void deleteGrade(String id) {
@@ -105,7 +102,7 @@ public class GradeService {
     public GradeDTO updateGrade(String id, GradeDTO grade) {
         GradeEntity entity = convertToEntity(grade);
         entity.setGradeId(UUID.fromString(id));
-        return  convertToDTO( gradeRepository.save(entity));
+        return convertToDTO(gradeRepository.save(entity));
     }
 
     public double calculateAverageGradeForClass(UUID subjectId, int year) {
@@ -121,7 +118,6 @@ public class GradeService {
         double sum = grades.stream().mapToInt(GradeEntity::getGradeValue).sum();
         return sum / grades.size();
     }
-
 
 
     private Date getStartOfYear(int year) {
@@ -141,27 +137,33 @@ public class GradeService {
     }
 
     public Map<UUID, Double> calculateAverageGradesForYear(int year) {
-        Date startDate = getStartOfYear(year);
-        Date endDate = getEndOfYear(year);
+        observabilityService.start("service.calculateAverageGradesForYear");
+        try {
+            Date startDate = getStartOfYear(year);
+            Date endDate = getEndOfYear(year);
 
-        // Get all grades in the given year
-        List<GradeEntity> grades = gradeRepository.findByGradingDateBetween(startDate, endDate);
+            observabilityService.start("repository.findByGradingDateBetween");
+            // Get all grades in the given year
+            List<GradeEntity> grades = gradeRepository.findByGradingDateBetween(startDate, endDate);
+            observabilityService.stop("repository.findByGradingDateBetween");
+            // Group grades by subject
+            Map<UUID, List<GradeEntity>> gradesBySubject = grades.stream()
+                    .collect(Collectors.groupingBy(g -> g.getSubjectEntity().getIdentifier()));
 
-        // Group grades by subject
-        Map<UUID, List<GradeEntity>> gradesBySubject = grades.stream()
-                .collect(Collectors.groupingBy(g -> g.getSubjectEntity().getIdentifier()));
-
-        // Calculate average for each subject
-        Map<UUID, Double> averages = new HashMap<>();
-        for (Map.Entry<UUID, List<GradeEntity>> entry : gradesBySubject.entrySet()) {
-            UUID subjectId = entry.getKey();
-            List<GradeEntity> subjectGrades = entry.getValue();
-            double average = subjectGrades.stream()
-                    .mapToInt(GradeEntity::getGradeValue)
-                    .average()
-                    .orElse(0.0);  // If there are no grades, the average is 0
-            averages.put(subjectId, average);
+            // Calculate average for each subject
+            Map<UUID, Double> averages = new HashMap<>();
+            for (Map.Entry<UUID, List<GradeEntity>> entry : gradesBySubject.entrySet()) {
+                UUID subjectId = entry.getKey();
+                List<GradeEntity> subjectGrades = entry.getValue();
+                double average = subjectGrades.stream()
+                        .mapToInt(GradeEntity::getGradeValue)
+                        .average()
+                        .orElse(0.0);  // If there are no grades, the average is 0
+                averages.put(subjectId, average);
+            }
+            return averages;
+        } finally {
+            observabilityService.stop("service.calculateAverageGradesForYear");
         }
-        return averages;
     }
 }

@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @Service
 public class StudentService {
     private final StudentRepository studentRepository;
-
+    private final ObservabilityService observabilityService;
 
     private final ModelMapper modelMapper;
 
@@ -29,8 +29,9 @@ public class StudentService {
         return modelMapper.map(studentDTO, StudentEntity.class);
     }
 
-    public StudentService(StudentRepository studentRepository, ModelMapper modelMapper) {
+    public StudentService(StudentRepository studentRepository, ObservabilityService observabilityService, ModelMapper modelMapper) {
         this.studentRepository = studentRepository;
+        this.observabilityService = observabilityService;
         this.modelMapper = modelMapper;
     }
     public List<StudentDTO> getAllStudents() {
@@ -46,8 +47,13 @@ public class StudentService {
     }
 
     public StudentDTO saveStudent(StudentDTO student) {
-        StudentEntity savedStudent = studentRepository.save(createStudentEntity(student));
-        return createStudentDTO(savedStudent);
+        observabilityService.start("service.saveStudent");
+        try {
+            StudentEntity savedStudent = studentRepository.save(createStudentEntity(student));
+            return createStudentDTO(savedStudent);
+        }finally {
+            observabilityService.stop("service.saveStudent");
+        }
     }
 
     public void deleteStudent(String id) {

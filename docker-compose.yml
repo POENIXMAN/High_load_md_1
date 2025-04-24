@@ -19,6 +19,21 @@ services:
         limits:
           cpus: '0.5'
 
+  calculation-service:
+    image: ${CALC_APP_IMAGE}
+    container_name: ${CALC_APP_CONTAINER_NAME}
+    environment:
+      SERVER_PORT: 8081
+    ports:
+      - "8081:8081"
+    networks:
+      - app-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+
 
 volumes:
   db-data:

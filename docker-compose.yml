@@ -1,38 +1,15 @@
 services:
-  db:
-    image: ${DB_IMAGE:-postgres:15-alpine}
-    container_name: ${DB_CONTAINER_NAME:-school-db}
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:-schooldb}
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-    volumes:
-      - db-data:/var/lib/postgresql/data
-    ports:
-      - "${DB_PORT:-5432}:5432"
-    networks:
-      - app-network
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-schooldb}" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-
   app:
-    image: ${APP_IMAGE:-school-journal-app}
-    container_name: ${APP_CONTAINER_NAME:-school-journal-app}
-    depends_on:
-      db:
-        condition: service_healthy
+    image: ${APP_IMAGE}
+    container_name: ${APP_CONTAINER_NAME}
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/schooldb
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
 
-      SERVER_TOMCAT_THREADS_MAX: ${TOMCAT_THREADS_MAX:-200}
-      SERVER_TOMCAT_THREADS_MIN_SPARE: ${TOMCAT_THREADS_MIN_SPARE:-10}
+      SERVER_TOMCAT_THREADS_MAX: ${TOMCAT_THREADS_MAX}
+      SERVER_TOMCAT_THREADS_MIN_SPARE: ${TOMCAT_THREADS_MIN_SPARE}
     ports:
       - "8080:8080"
     networks:
@@ -41,7 +18,6 @@ services:
       resources:
         limits:
           cpus: '0.5'
-          memory: 512M
 
 
 volumes:

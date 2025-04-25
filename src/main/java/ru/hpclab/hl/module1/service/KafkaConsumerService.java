@@ -57,8 +57,8 @@ public class KafkaConsumerService {
         switch (kafkaMessage.getOperation().toUpperCase()) {
             case "POST":
                 StudentDTO studentDTO = objectMapper.readValue(kafkaMessage.getPayload(), StudentDTO.class);
-                StudentDTO savedStudent = studentService.saveStudent(studentDTO); 
-                logger.info("Created student: {}", savedStudent);
+                //StudentDTO savedStudent = studentService.saveStudent(studentDTO); 
+                //logger.info("Created student: {}", savedStudent);
                 break;
             case "PUT":
                 StudentDTO updatedStudent = objectMapper.readValue(kafkaMessage.getPayload(), StudentDTO.class);

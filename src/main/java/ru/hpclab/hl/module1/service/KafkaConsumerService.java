@@ -20,7 +20,7 @@ public class KafkaConsumerService {
         this.objectMapper = objectMapper;
     }
 
-    @KafkaListener(topics = "var10", groupId = "student-group", concurrency = "2")
+    @KafkaListener(topics = "var10", groupId = "student-group", concurrency = "1")
     public void listen(String message) {
         try {
             KafkaMessage kafkaMessage = objectMapper.readValue(message, KafkaMessage.class);
@@ -37,7 +37,6 @@ public class KafkaConsumerService {
                     logger.info("Created student: {}", studentDTO);
                     break;
                 case "PUT":
-                    // Assuming payload contains both ID and student data
                     StudentDTO updatedStudent = objectMapper.readValue(kafkaMessage.getPayload(), StudentDTO.class);
                     studentService.updateStudent(updatedStudent.getStudentId().toString(), updatedStudent);
                     logger.info("Updated student with ID: {}", updatedStudent.getStudentId());
@@ -54,3 +53,4 @@ public class KafkaConsumerService {
         }
     }
 }
+

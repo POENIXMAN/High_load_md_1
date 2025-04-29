@@ -22,7 +22,7 @@ spec:
         - "hl23.zil"
       containers:
       - name: school-journal-app
-        image: izrafil/school-journal-app:17
+        image: izrafil/school-journal-app:18
         imagePullPolicy: Always
         ports:
         - containerPort: 8080

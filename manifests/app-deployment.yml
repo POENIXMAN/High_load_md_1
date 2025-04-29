@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: school-journal-app
+  namespace: var10
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: school-journal-app
+  template:
+    metadata:
+      labels:
+        app: school-journal-app
+    spec:
+      containers:
+      - name: school-journal-app
+        image: izrafil/school-journal-app:30
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: app-config
+        - secretRef:
+            name: db-secret
+        resources:
+          limits:
+            cpu: "0.5"
+      imagePullSecrets:
+      - name: dockerhub-secret

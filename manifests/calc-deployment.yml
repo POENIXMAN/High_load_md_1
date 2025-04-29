@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: calculation-service
+  namespace: var10
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: calculation-service
+  template:
+    metadata:
+      labels:
+        app: calculation-service
+    spec:
+      containers:
+      - name: calculation-service
+        image: izrafil/calculation_service:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8081
+        envFrom:
+        - configMapRef:
+            name: app-config
+        - secretRef:
+            name: db-secret
+        resources:
+          limits:
+            cpu: "0.5"
+      imagePullSecrets:
+      - name: dockerhub-secret

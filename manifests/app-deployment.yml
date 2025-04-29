@@ -13,17 +13,17 @@ spec:
       labels:
         app: school-journal-app
     spec:
+      hostAliases:
+      - ip: "10.60.3.27"
+        hostnames:
+        - "hl22.zil"
+      - ip: "10.60.3.28"
+        hostnames:
+        - "hl23.zil"
       containers:
       - name: school-journal-app
         image: izrafil/school-journal-app:17
         imagePullPolicy: Always
-        hostAliases:
-        - ip: "10.60.3.27"
-          hostnames:
-          - "hl22.zil"
-        - ip: "10.60.3.28"
-          hostnames:
-          - "hl23.zil"
         ports:
         - containerPort: 8080
         envFrom:

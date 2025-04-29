@@ -26,6 +26,10 @@ spec:
             name: db-secret
         resources:
           limits:
-            cpu: "0.5"
+            cpu: "1"
+            memory: "1Gi"
+          requests:
+            cpu: "1"
+            memory: "1Gi"
       imagePullSecrets:
       - name: dockerhub-secret

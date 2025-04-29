@@ -45,14 +45,14 @@ spec:
           httpGet:
             path: /actuator/health
             port: 8080
-          initialDelaySeconds: 10
+          initialDelaySeconds: 30
           periodSeconds: 5
           failureThreshold: 3
         livenessProbe:
           httpGet:
             path: /actuator/health
             port: 8080
-          initialDelaySeconds: 30
+          initialDelaySeconds: 60
           periodSeconds: 10
           failureThreshold: 3
       imagePullSecrets:

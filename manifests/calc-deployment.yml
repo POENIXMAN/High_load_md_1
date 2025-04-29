@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: calculation-service
-        image: izrafil/calculation_service:15
+        image: izrafil/calculation_service:18
         imagePullPolicy: Always
         ports:
         - containerPort: 8081

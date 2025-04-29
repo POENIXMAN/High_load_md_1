@@ -31,7 +31,7 @@ public class KafkaConsumerService {
     }
 
     @KafkaListener(topics = "var10", groupId = "student-group", concurrency = "2")
-    public void listen(List<String> message) {
+    public void listen(String message) {
         try {
             KafkaMessage kafkaMessage = objectMapper.readValue(message, KafkaMessage.class);
 
@@ -129,4 +129,3 @@ public class KafkaConsumerService {
         }
     }
 }
-

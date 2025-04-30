@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ResourceQuota
 metadata:
-  name: namespace-quota
+  name: var10-quota
   namespace: var10
 spec:
   hard:

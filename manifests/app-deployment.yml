@@ -36,10 +36,10 @@ spec:
             name: db-secret
         resources:
           limits:
-            cpu: "1"
+            cpu: "2"
             memory: "1Gi"
           requests:
-            cpu: "1"
+            cpu: "2"
             memory: "1Gi"
         readinessProbe:
           httpGet:
